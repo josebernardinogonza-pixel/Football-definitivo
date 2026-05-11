@@ -2,7 +2,7 @@ name: Entrenar y predecir diario
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # Ejecuta 23:00 UTC todos los días
+    - cron: '0 23 * * *'  # Todos los días 23:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -10,26 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+    
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+      - name: Install dependencies
+        run: pip install requests pandas scikit-learn
 
-    - name: Install dependencies
-      run: pip install requests pandas scikit-learn
+      - name: Run main.py
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
 
-    - name: Run main script
-      env:
-        API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
-        ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: python main.py
+      - name: Upload trained model
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: models/model.pkl
 
-    - name: Upload model as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: trained-model
-        path: models/model.pkl
+      - name: Upload predictions csv
+        uses: actions/upload-artifact@v4
+        with:
+          name: predictions
+          path: data/processed/predictions.csv
+
+      - name: Upload training data csv
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-data
+          path: data/processed/training_data.csv
