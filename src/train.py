@@ -8,7 +8,6 @@ MODEL_PATH = Path('models/model.pkl')
 
 def train(df):
     X = pd.get_dummies(df[['home_team', 'away_team']])
-    # Se añaden odds como variables numéricas
     X['home_odds'] = df['home_odds']
     X['draw_odds'] = df['draw_odds']
     X['away_odds'] = df['away_odds']
@@ -21,7 +20,7 @@ def train(df):
     model.fit(X_train, y_train)
 
     val_score = model.score(X_val, y_val)
-    print(f"Validation accuracy: {val_score:.4f}")
+    print(f"Validación accuracy: {val_score:.4f}")
 
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(MODEL_PATH, 'wb') as f:
