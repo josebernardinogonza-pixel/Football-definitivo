@@ -9,6 +9,9 @@ def clean_and_merge(fixtures, odds):
         if team:
             odds_lookup[entry['home_team']] = entry
 
+    print(f"Fixtures recibidos: {len(fixtures)}")
+    print(f"Entradas de odds recibidas: {len(odds)}")
+    
     rows = []
     for f in fixtures:
         if f['fixture']['status']['short'] != 'FT':
@@ -47,4 +50,10 @@ def clean_and_merge(fixtures, odds):
         })
 
     df = pd.DataFrame(rows)
+    print(f"Filas válidas creadas: {len(rows)}")
+    print(f"Después de dropna: {len(df)}")
+    
+    if df.empty:
+        print("ADVERTENCIA: No se encontraron datos de partidos válidos.")
+    
     return df.dropna()

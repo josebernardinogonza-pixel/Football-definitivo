@@ -7,6 +7,16 @@ from pathlib import Path
 MODEL_PATH = Path('models/model.pkl')
 
 def train(df):
+    # Validate DataFrame is not empty and has required columns
+    required_cols = ['home_team', 'away_team', 'home_odds', 'draw_odds', 'away_odds', 'result_home_win']
+    
+    if df.empty:
+        raise ValueError("Training DataFrame is empty. No completed matches with valid odds found.")
+    
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing required columns: {missing_cols}")
+    
     X = pd.get_dummies(df[['home_team', 'away_team']])
     X['home_odds'] = df['home_odds']
     X['draw_odds'] = df['draw_odds']
